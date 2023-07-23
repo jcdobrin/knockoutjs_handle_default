@@ -1,11 +1,15 @@
-ko.handleDefault = function(v, d) {
-	if(v == undefined && d != undefined) {
-		return ko.isObservable(d) ? d : ko.observable(d);
-	} else if(v == undefined) {
-		return ko.observable();
-	} else {
-		return ko.isObservable(v) ? v : ko.observable(v);
+ko.handleDefault = function() {
+	for(let arg of arguments) {
+		if(arg != undefined) {
+			return ko.isObservable(arg) ? arg : ko.observable(arg);
+		}
 	}
+	if(!arguments.length) {
+		throw "handleDefault called with no arguments";
+	} else {
+		throw "handleDefault called with all undefined arguments";
+	}
+	return ko.observable();
 }
 
 ko.isObservableArray = function(a) {
@@ -13,16 +17,25 @@ ko.isObservableArray = function(a) {
 }
 
 ko.handleDefaultArray = function(v, d) {
-   var a = ko.observableArray();
-   if(v == undefined && d != undefined) {
-	   if( ko.isObservableArray(d))
-		   return d
-	   ko.utils.arrayPushAll(a, d);
-   } else if(v != undefined) {
-	   if(ko.isObservableArray(v)) {
-		   return v;
-	   }
-	   ko.utils.arrayPushAll(a, v);
-   }
-   return a;
+	for(let arg of arguments) {
+		if(arg != undefined) {
+			if(ko.isObservableArray(arg)) {
+				return arg;
+			} else {
+				let arr = ko.observableArray();
+				ko.utils.arrayPushAll(arr, arg);
+				return arr;
+			}
+		}
+	}
+
+	if(!arguments.length) {
+		throw "handleDefault called with no arguments";
+	} else {
+		throw "handleDefault called with all undefined arguments";
+	}
+	return ko.observableArray();
 }
+
+ko.observableCoalesce = ko.handleDefault;
+ko.observableArrayCoalesce = ko.handleDefaultArray;
