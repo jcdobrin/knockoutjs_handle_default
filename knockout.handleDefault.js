@@ -16,15 +16,17 @@ ko.isObservableArray = function(a) {
 	return ko.isObservable(a) && !(a.destroyAll === undefined);
 }
 
-ko.handleDefaultArray = function(v, d) {
+ko.handleDefaultArray = function() {
 	for(let arg of arguments) {
 		if(arg != undefined) {
 			if(ko.isObservableArray(arg)) {
 				return arg;
-			} else {
+			} else if (Array.isArray(arg)) {
 				let arr = ko.observableArray();
 				ko.utils.arrayPushAll(arr, arg);
 				return arr;
+			} else {
+				return ko.observableArray([arg]);
 			}
 		}
 	}
